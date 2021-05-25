@@ -1,0 +1,163 @@
+type    dataset    size    duration
+
+
+
+
+Cuckoo_MCuniv1     65536     1.9648e-06
+Cuckoo_MCcaida     65536     4.96326e-07
+Cuckoo_MCcaida18     65536     2.46915e-07
+
+Cuckoo_MCuniv1     65536     1.9648e-06
+Cuckoo_MCcaida     65536     4.96326e-07
+Cuckoo_MCcaida18     65536     2.46915e-07
+
+Cuckoo_MCuniv1     65536     1.9648e-06
+Cuckoo_MCcaida     65536     4.96326e-07
+Cuckoo_MCcaida18     65536     2.46915e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     131072     1.9648e-06
+Cuckoo_MCcaida     131072     4.95748e-07
+Cuckoo_MCcaida18     131072     2.49542e-07
+
+Cuckoo_MCuniv1     131072     1.9648e-06
+Cuckoo_MCcaida     131072     4.95748e-07
+Cuckoo_MCcaida18     131072     2.49542e-07
+
+Cuckoo_MCuniv1     131072     1.9648e-06
+Cuckoo_MCcaida     131072     4.95748e-07
+Cuckoo_MCcaida18     131072     2.49542e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     262144     1.9648e-06
+Cuckoo_MCcaida     262144     5.19359e-07
+Cuckoo_MCcaida18     262144     2.45904e-07
+
+Cuckoo_MCuniv1     262144     1.9648e-06
+Cuckoo_MCcaida     262144     5.19359e-07
+Cuckoo_MCcaida18     262144     2.45904e-07
+
+Cuckoo_MCuniv1     262144     1.9648e-06
+Cuckoo_MCcaida     262144     5.19359e-07
+Cuckoo_MCcaida18     262144     2.45904e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     524288     1.9648e-06
+Cuckoo_MCcaida     524288     5.10036e-07
+Cuckoo_MCcaida18     524288     2.49456e-07
+
+Cuckoo_MCuniv1     524288     1.9648e-06
+Cuckoo_MCcaida     524288     5.10036e-07
+Cuckoo_MCcaida18     524288     2.49456e-07
+
+Cuckoo_MCuniv1     524288     1.9648e-06
+Cuckoo_MCcaida     524288     5.10036e-07
+Cuckoo_MCcaida18     524288     2.49456e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     1048576     1.9648e-06
+Cuckoo_MCcaida     1048576     4.82972e-07
+Cuckoo_MCcaida18     1048576     2.36132e-07
+
+Cuckoo_MCuniv1     1048576     1.9648e-06
+Cuckoo_MCcaida     1048576     4.82972e-07
+Cuckoo_MCcaida18     1048576     2.36132e-07
+
+Cuckoo_MCuniv1     1048576     1.9648e-06
+Cuckoo_MCcaida     1048576     4.82972e-07
+Cuckoo_MCcaida18     1048576     2.36132e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     2097152     1.9648e-06
+Cuckoo_MCcaida     2097152     4.68976e-07
+Cuckoo_MCcaida18     2097152     2.27606e-07
+
+Cuckoo_MCuniv1     2097152     1.9648e-06
+Cuckoo_MCcaida     2097152     4.68976e-07
+Cuckoo_MCcaida18     2097152     2.27606e-07
+
+Cuckoo_MCuniv1     2097152     1.9648e-06
+Cuckoo_MCcaida     2097152     4.68976e-07
+Cuckoo_MCcaida18     2097152     2.27606e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     4194304     1.9648e-06
+Cuckoo_MCcaida     4194304     4.61878e-07
+Cuckoo_MCcaida18     4194304     2.19041e-07
+
+Cuckoo_MCuniv1     4194304     1.9648e-06
+Cuckoo_MCcaida     4194304     4.61878e-07
+Cuckoo_MCcaida18     4194304     2.19041e-07
+
+Cuckoo_MCuniv1     4194304     1.9648e-06
+Cuckoo_MCcaida     4194304     4.61878e-07
+Cuckoo_MCcaida18     4194304     2.19041e-07
+
+
+
+
+
+
+
+
+
+
+Cuckoo_MCuniv1     8388608     1.9648e-06
+Cuckoo_MCcaida     8388608     4.61878e-07
+Cuckoo_MCcaida18     8388608     2.19041e-07
+
+Cuckoo_MCuniv1     8388608     1.9648e-06
+Cuckoo_MCcaida     8388608     4.61878e-07
+Cuckoo_MCcaida18     8388608     2.19041e-07
+
+Cuckoo_MCuniv1     8388608     1.9648e-06
+Cuckoo_MCcaida     8388608     4.61878e-07
+Cuckoo_MCcaida18     8388608     2.19041e-07
