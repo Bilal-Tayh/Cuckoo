@@ -1,0 +1,139 @@
+type    dataset    size    duration
+
+
+
+Fmeg    univ1     65536    0.421569
+Fmeg    caida     65536    4.99578
+Fmeg    caida18     65536    5.28024
+
+Fmeg    univ1     65536    0.440304
+Fmeg    caida     65536    5.0177
+Fmeg    caida18     65536    5.26414
+
+Fmeg    univ1     65536    0.441228
+Fmeg    caida     65536    4.99164
+Fmeg    caida18     65536    5.26214
+
+
+
+
+
+Fmeg    univ1     131072    0.420477
+Fmeg    caida     131072    4.83146
+Fmeg    caida18     131072    5.28236
+
+Fmeg    univ1     131072    0.440472
+Fmeg    caida     131072    4.85775
+Fmeg    caida18     131072    5.10773
+
+Fmeg    univ1     131072    0.439825
+Fmeg    caida     131072    4.83829
+Fmeg    caida18     131072    5.07839
+
+
+
+
+
+
+Fmeg    univ1     262144    0.41597
+Fmeg    caida     262144    4.91836
+Fmeg    caida18     262144    5.17641
+
+Fmeg    univ1     262144    0.440354
+Fmeg    caida     262144    4.88987
+Fmeg    caida18     262144    5.14883
+
+Fmeg    univ1     262144    0.43855
+Fmeg    caida     262144    4.90499
+Fmeg    caida18     262144    5.21721
+
+
+
+
+
+
+Fmeg    univ1     524288    0.41613
+Fmeg    caida     524288    5.19472
+Fmeg    caida18     524288    5.3274
+
+Fmeg    univ1     524288    0.441804
+Fmeg    caida     524288    5.27517
+Fmeg    caida18     524288    5.33119
+
+Fmeg    univ1     524288    0.439124
+Fmeg    caida     524288    5.36506
+Fmeg    caida18     524288    5.39844
+
+
+
+
+
+
+
+Fmeg    univ1     1.04858e+06    0.415989
+Fmeg    caida     1.04858e+06    6.02905
+Fmeg    caida18     1.04858e+06    5.85323
+
+Fmeg    univ1     1.04858e+06    0.437072
+Fmeg    caida     1.04858e+06    6.1361
+Fmeg    caida18     1.04858e+06    5.7756
+
+Fmeg    univ1     1.04858e+06    0.436381
+Fmeg    caida     1.04858e+06    6.01225
+Fmeg    caida18     1.04858e+06    5.89296
+
+
+
+
+
+
+
+Fmeg    univ1     2.09715e+06    0.419223
+Fmeg    caida     2.09715e+06    6.21161
+Fmeg    caida18     2.09715e+06    5.8419
+
+Fmeg    univ1     2.09715e+06    0.429686
+Fmeg    caida     2.09715e+06    6.26412
+Fmeg    caida18     2.09715e+06    5.87343
+
+Fmeg    univ1     2.09715e+06    0.431072
+Fmeg    caida     2.09715e+06    6.25897
+Fmeg    caida18     2.09715e+06    5.82827
+
+
+
+
+
+
+
+
+Fmeg    univ1     4.1943e+06    0.435876
+Fmeg    caida     4.1943e+06    6.25575
+Fmeg    caida18     4.1943e+06    5.91975
+
+Fmeg    univ1     4.1943e+06    0.432235
+Fmeg    caida     4.1943e+06    6.28902
+Fmeg    caida18     4.1943e+06    5.87993
+
+Fmeg    univ1     4.1943e+06    0.430215
+Fmeg    caida     4.1943e+06    6.27419
+Fmeg    caida18     4.1943e+06    5.89247
+
+
+
+
+
+
+
+
+Fmeg    univ1     8.38861e+06    0.419125
+Fmeg    caida     8.38861e+06    6.18473
+Fmeg    caida18     8.38861e+06    5.82746
+
+Fmeg    univ1     8.38861e+06    0.429796
+Fmeg    caida     8.38861e+06    6.19869
+Fmeg    caida18     8.38861e+06    5.8377
+
+Fmeg    univ1     8.38861e+06    0.430046
+Fmeg    caida     8.38861e+06    6.21229
+Fmeg    caida18     8.38861e+06    5.81486
