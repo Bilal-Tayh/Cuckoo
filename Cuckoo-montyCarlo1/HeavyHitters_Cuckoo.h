@@ -82,7 +82,7 @@ void initFastMod1(uint32_t d) {                                 // Set or change
     shf12 = sh2;
 }
 
-constexpr int hh_nr_bins = 1 << 21;
+constexpr int hh_nr_bins = 1 << 14;
 constexpr int hh_nr_bins_over_two = hh_nr_bins >> 1;
 
 template<class K, class V>
@@ -102,7 +102,7 @@ private:
 	int _seed3;
 
 	int _mask;
-    
+    int _max_possible_maintenances;
     int _Z;
     int _k;
     double _alpha;
@@ -123,7 +123,7 @@ public:
 	V _water_level;
 	void test_correctness();
 	void test_speed();
-	Cuckoo_waterLevel_HH_no_FP_SIMD_256(int seed1, int seed2, int seed3, float max_load,float gamma);
+	Cuckoo_waterLevel_HH_no_FP_SIMD_256(int seed1, int seed2, int seed3, float max_load,float gamma,int n);
 	~Cuckoo_waterLevel_HH_no_FP_SIMD_256();
 	void insert(K key, V value);
 	V query(K key);
@@ -131,7 +131,7 @@ public:
 
 
 template<class K, class V>
-Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::Cuckoo_waterLevel_HH_no_FP_SIMD_256(int seed1, int seed2, int seed3, float max_load, float gamma) {
+Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::Cuckoo_waterLevel_HH_no_FP_SIMD_256(int seed1, int seed2, int seed3, float max_load, float gamma, int n) {
 
     max_load = max_load/(1+gamma);
     
@@ -150,7 +150,7 @@ Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::Cuckoo_waterLevel_HH_no_FP_SIMD_256(i
     
         
     
-    _delta = 0.99;
+    _delta = 0.05;
     _alpha = 0.83;
     _gamma = gamma;
     
@@ -160,12 +160,17 @@ Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::Cuckoo_waterLevel_HH_no_FP_SIMD_256(i
     
     _insertions_till_maintenance_restart *= (2*_alpha) - 1;
     
+    _max_possible_maintenances = (n-_max_load)/ _insertions_till_maintenance_restart;
+    _delta /= _max_possible_maintenances;
+    
     _k = ceil(((_alpha * _gamma * (2 + _gamma - _alpha * _gamma)) / (pow(_gamma - _alpha * _gamma, 2))) * log(1 / _delta));
     _Z = (int)((_k * (1 + _gamma)) / (_alpha * _gamma));
     if (_Z & 0b111) // integer multiple of 8
         _Z = _Z - (_Z & 0b111) + 8;
     _k = _Z * (_alpha * _gamma) / (1 + _gamma)+0.5;
     
+    cout<< "Z " <<_Z <<endl;
+    cout<< "k " <<_k <<endl;
     
     initFastMod(hh_nr_bins_over_two);
     initFastMod1(8);
@@ -391,6 +396,14 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::get8samples1() {
 template<class K, class V>
 inline void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::maintenance()
 {
+    
+/*    
+    cout<< "@@@@@@@@@@@@@@@"<<endl;
+    cout<< "delta "<< _delta <<endl;
+    cout<< "Z " <<_Z <<endl;
+    cout<< "k " <<_k <<endl;
+    */
+    
 //     cout<< "maintenance" << endl;
 // 	int size = hh_nr_bins_over_two * 8;
 // 	V copy_of_values[hh_nr_bins_over_two][8];
@@ -435,7 +448,7 @@ inline void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::maintenance()
         left_to_sample -= 8;
     }
     
-    updateZK();
+//     updateZK();
     
     set_water_level(top);
 	_insertions_till_maintenance = _insertions_till_maintenance_restart;

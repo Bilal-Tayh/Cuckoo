@@ -107,10 +107,10 @@ int main(int argc, char* argv[])
     vector<int> sizes;
     vector<string> datasets;
     
-
+/*
     getKeysAndWeightsFromFile("../../datasets/UNIV1/mergedAggregatedPktlen_Srcip", keys, values, UNIV1_SIZE);
     sizes.push_back(UNIV1_SIZE);
-    datasets.push_back("univ1");
+    datasets.push_back("univ1");*/
     
 
 
@@ -118,18 +118,18 @@ int main(int argc, char* argv[])
     sizes.push_back(CAIDA16_SIZE);
     datasets.push_back("caida");
 
-
+/*
 
     getKeysAndWeightsFromFile("../../datasets/CAIDA18/mergedAggregatedPktlen_Srcip", keys, values, CAIDA18_SIZE);
     sizes.push_back(CAIDA18_SIZE);
-    datasets.push_back("caida18");
+    datasets.push_back("caida18");*/
 
     
     
     
-    int k = 3;
-    double maxl = 0.7;
-    double gamma = 0.99;
+    int k = 1;
+    double maxl = 0.6;
+    double gamma = 1.0;
     
     ofstream ostream;
     setupOutputFile("time.raw_res", ostream, false);
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         vector<int>::iterator s_it = sizes.begin();
         vector<string>::iterator d_it = datasets.begin();
         
-        for (int trc = 0; trc < 3; trc++) {
+        for (int trc = 0; trc < 1; trc++) {
             key* kk = *k_it;
             val* vv = *v_it;
             int size = *s_it;
@@ -154,50 +154,48 @@ int main(int argc, char* argv[])
             
             struct timeb begintb, endtb;
             clock_t begint, endt;
-            Cuckoo_waterLevel_HH_no_FP_SIMD_256<uint32_t, uint32_t> hh(1, 2, 3, maxl,gamma);
+            Cuckoo_waterLevel_HH_no_FP_SIMD_256<uint32_t, uint32_t> hh(1, 2, 3, maxl,gamma,size);
             begint = clock();
-            ftime(&begintb);
+//             ftime(&begintb);
             for (int i = 0; i < size; ++i) {
                 hh.insert(kk[i], vv[i]);
-//                 cout<<i << endl;
             }
-//             cout<<"outtttttttt1" << endl;
             endt = clock();
-            ftime(&endtb);
+//             ftime(&endtb);
             double time = ((double)(endt-begint))/CLK_PER_SEC;
 
             
                 
-            double c =0.0; 
-            uint64_t vol =0;
-            unordered_map<key, val> map;
-            Cuckoo_waterLevel_HH_no_FP_SIMD_256<uint32_t, uint32_t> hh1(1, 2, 3, maxl,gamma);
-            for (int i = 0; i < size; ++i) {
-                    map[kk[i]] +=vv[i];
-                    hh1.insert(kk[i], vv[i]);
-                    uint32_t err = map[kk[1]] - hh1.query(kk[i]);
-                    c+= err*err;
-                    vol+=vv[i];
-            }
-            double mse = c/size;
-            double rmse = sqrt(mse);
-            double nrmse = rmse/vol;
-            
-            
-            
-            int hh_nr_bins = 1 << 21;
+//             double c =0.0; 
+//             uint64_t vol =0;
+//             unordered_map<key, val> map;
+//             Cuckoo_waterLevel_HH_no_FP_SIMD_256<uint32_t, uint32_t> hh1(1, 2, 3, maxl,gamma,size);
+//             for (int i = 0; i < size; ++i) {
+//                     map[kk[i]] +=vv[i];
+//                     hh1.insert(kk[i], vv[i]);
+//                     uint32_t err = map[kk[1]] - hh1.query(kk[i]);
+//                     c+= err*err;
+//                     vol+=vv[i];
+//             }
+//             double mse = c/size;
+//             double rmse = sqrt(mse);
+//             double nrmse = rmse/vol;
+//             
+//             
+//             
+            int hh_nr_bins = 1 << 14;
             int hh_nr_bins_over_two = hh_nr_bins >> 1;
             int q = hh_nr_bins_over_two * 8;
             
             
             ostream << "Cuckoo_MC" << dataset<<   "     " << q <<  "    " << time << endl;
-            ostream1 << "Cuckoo_MC" << dataset<<  "     " << q << "     " << nrmse << endl;
-            
-            
-            ++k_it;
-            ++v_it;
-            ++s_it;
-            ++d_it;
+//             ostream1 << "Cuckoo_MC" << dataset<<  "     " << q << "     " << nrmse << endl;
+//             
+//             
+//             ++k_it;
+//             ++v_it;
+//             ++s_it;
+//             ++d_it;
             
         }
         
