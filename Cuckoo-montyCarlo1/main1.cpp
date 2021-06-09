@@ -29,8 +29,8 @@
 #define CAIDA18_SIZE 175880896
 #define UNIV1_SIZE 17323447
 
-typedef unsigned long long key;
-typedef double val;
+typedef unsigned key;
+typedef unsigned short val;
 
 using namespace std;
 
@@ -82,8 +82,8 @@ void getKeysAndWeightsFromFile(string filename, vector<key*> &keys, vector<val*>
     iss >> len;
     iss >> id;
     try {
-      file_keys[i] = stoull(id);
-      file_ws[i] = stod(len);
+      file_keys[i] = stoul(id);
+      file_ws[i] = stoi(len);
     } catch (const std::invalid_argument& ia) {
       cerr << "Invalid argument: " << ia.what() << " at line " << i << endl;
       cerr << len << " " << id << endl;;
@@ -100,107 +100,52 @@ void getKeysAndWeightsFromFile(string filename, vector<key*> &keys, vector<val*>
 
 
 
+double run(int traceSize, key* kk, val* vv, int runs){
+    double time = 0;
+    for (int run = 0; run < runs; run++) {
+            double maxl = 0.5;
+            double gamma = 1.0;
+            
+            
+            struct timeb begintb, endtb;
+            clock_t begint, endt;
+            Cuckoo_waterLevel_HH_no_FP_SIMD_256<uint32_t, uint32_t> hh(1, 2, 3, maxl,gamma,traceSize);
+            begint = clock();
+        //             ftime(&begintb);
+            for (int i = 0; i < traceSize; ++i) {
+                hh.insert(kk[i], vv[i]);
+            }
+            endt = clock();
+        //             ftime(&endtb);
+            time += ((double)(endt-begint))/CLK_PER_SEC;
+            
+        
+    }
+    return time/runs;
+}
+
 int main(int argc, char* argv[])
 {
 //     vector<key*> keys;
 //     vector<val*> values;
-//     vector<int> sizes;
-//     vector<string> datasets;
-    
-
-//     getKeysAndWeightsFromFile("../../datasets/UNIV1/mergedAggregatedPktlen_Srcip", keys, values, UNIV1_SIZE);
-//     sizes.push_back(UNIV1_SIZE);
-//     datasets.push_back("univ1");
-//     
-
-
 //     getKeysAndWeightsFromFile("../../datasets/CAIDA16/mergedAggregatedPktlen_Srcip", keys, values, CAIDA16_SIZE);
-//     sizes.push_back(CAIDA16_SIZE);
-//     datasets.push_back("caida");
-
-
-
-//     getKeysAndWeightsFromFile("../../datasets/CAIDA18/mergedAggregatedPktlen_Srcip", keys, values, CAIDA18_SIZE);
-//     sizes.push_back(CAIDA18_SIZE);
-//     datasets.push_back("caida18");
-
-
-    
-    
-    
-    
-    
-    
-    
-/*    
-    getKeysAndWeightsFromFile("../../datasets/UNIV1/mergedAggregatedPktlen_Srcip", keys, values, UNIV1_SIZE);
-    sizes.push_back(UNIV1_SIZE);
-    datasets.push_back("univ1");
-
-    
-    
-    vector<key*>::iterator k_it = keys.begin();
-    key* k = *k_it;
-
-    int size =sizeof(key*);
-    int traceSize = UNIV1_SIZE;
-    ofstream f;
-
-    f.open("univ1_k.dat",ios::binary|ios::out); 
-
-    for(int j=0;j<traceSize;j++){
-        f.write((char *)&k[j],size);
-    }
-
-    f.close();
-    
-    
-    
-    
-    vector<val*>::iterator v_it = values.begin();
-    val* v = *v_it;
-
-    int size1 =sizeof(val*);
-    ofstream ff;
-
-    ff.open("univ1_v.dat",ios::binary|ios::out); 
-
-    for(int j=0;j<traceSize;j++){
-        ff.write((char *)&v[j],size1);
-    }
-
-    ff.close();
-    */
-    
-    
-    
-    
-    
-//##################
-    
-    
-    
-    
-    
-    
-//     getKeysAndWeightsFromFile("../../datasets/CAIDA16/mergedAggregatedPktlen_Srcip", keys, values, CAIDA16_SIZE);
-//     sizes.push_back(CAIDA16_SIZE);
-//     datasets.push_back("caida");
+// //     sizes.push_back(CAIDA16_SIZE);
+// //     datasets.push_back("caida");
 // 
 // 
 //     
 //     
-//     vector<key*>::iterator k_it = keys.begin();
-//     key* k = *k_it;
+//     vector<key*>::iterator k_it1 = keys.begin();
+//     key* k1 = *k_it1;
 // 
-//     int size =sizeof(key*);
+//     int size2 =sizeof(key);
 //     int traceSize = CAIDA16_SIZE;
 //     ofstream f1;
 // 
 //     f1.open("ca16_k.dat",ios::binary|ios::out); 
 // 
 //     for(int j=0;j<traceSize;j++){
-//         f1.write((char *)&k[j],size);
+//         f1.write((char *)&k1[j],size2);
 //     }
 // 
 //     f1.close();
@@ -208,123 +153,40 @@ int main(int argc, char* argv[])
 //     
 //     
 //     
-//     vector<val*>::iterator v_it = values.begin();
-//     val* v = *v_it;
+//     vector<val*>::iterator v_it1 = values.begin();
+//     val* v1 = *v_it1;
 // 
 // 
 //     ofstream ff1;
-//     int size1 =sizeof(val*);
+//     int size1 =sizeof(val);
 //     ff1.open("ca16_v.dat",ios::binary|ios::out); 
 // 
 //     for(int j=0;j<traceSize;j++){
-//         ff1.write((char *)&v[j],size1);
+//         ff1.write((char *)&v1[j],size1);
 //     }
 // 
 //     ff1.close();
-    
+//     
     
     //##################
     
-    
-    
-    
-//     getKeysAndWeightsFromFile("../../datasets/CAIDA18/mergedAggregatedPktlen_Srcip", keys, values, CAIDA18_SIZE);
-//     sizes.push_back(CAIDA18_SIZE);
-//     datasets.push_back("caida18");
-//     
-//     
-//     vector<key*>::iterator k_it = keys.begin();
-//     key* k = *k_it;
-// 
-//     int size =sizeof(key*);
-//     int traceSize = CAIDA18_SIZE;
-//     ofstream f1;
-// 
-//     f1.open("ca18_k.dat",ios::binary|ios::out); 
-// 
-//     for(int j=0;j<traceSize;j++){
-//         f1.write((char *)&k[j],size);
-//     }
-// 
-//     f1.close();
-//     
-//     
-//     
-//     
-//     vector<val*>::iterator v_it = values.begin();
-//     val* v = *v_it;
-// 
-// 
-//     ofstream ff1;
-//     int size1 =sizeof(val*);
-//     ff1.open("ca18_v.dat",ios::binary|ios::out); 
-// 
-//     for(int j=0;j<traceSize;j++){
-//         ff1.write((char *)&v[j],size1);
-//     }
-// 
-//     ff1.close();
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    vector<string> datasets;
-    datasets.push_back("univ1");
-    datasets.push_back("caida16");
-    datasets.push_back("caida18");
-    vector<int> sizes;
-    sizes.push_back(UNIV1_SIZE);
-    sizes.push_back(CAIDA16_SIZE);
-    sizes.push_back(CAIDA16_SIZE);
-        
-    
-    
-    
-    
-    
-    
-    ifstream ff_k;
-    ifstream ff_v;
-    key univ1_k[UNIV1_SIZE]= {};
-    val univ1_v[UNIV1_SIZE] = {};
-    ff_k.open("univ1_k.dat",ios::binary|ios::in);
-    ff_v.open("univ1_v.dat",ios::binary|ios::in);
 
-    for(int i=0;i<UNIV1_SIZE;i++){
+    
+    
 
-        ff_k.read((char *)&univ1_k[i],sizeof(key*));
-        ff_v.read((char *)&univ1_v[i],sizeof(key*));
+    
 
-    }
-    
-    ff_k.close();
-    ff_v.close();
-    
-    
-    
-    
-    
-    
-    
     
     ifstream ff1_k;
     ifstream ff1_v;
-    key ca16_k[CAIDA16_SIZE]= {};
-    val ca16_v[CAIDA16_SIZE] = {};
+    key kk[CAIDA16_SIZE]= {};
+    val vv[CAIDA16_SIZE] = {};
     ff1_k.open("ca16_k.dat",ios::binary|ios::in);
     ff1_v.open("ca16_v.dat",ios::binary|ios::in);
 
     for(int i=0;i<CAIDA16_SIZE;i++){
-        ff1_k.read((char *)&ca16_k[i],sizeof(key*));
-        ff1_v.read((char *)&ca16_v[i],sizeof(key*));
+        ff1_k.read((char *)&kk[i],sizeof(key));
+        ff1_v.read((char *)&vv[i],sizeof(val));
 
     }
     
@@ -335,13 +197,9 @@ int main(int argc, char* argv[])
     
     
     
-
     
     
-    
-    
-    
-    
+/*    
     ifstream ff2_k;
     ifstream ff2_v;
     key ca18_k[CAIDA18_SIZE]= {};
@@ -362,7 +220,7 @@ int main(int argc, char* argv[])
     
     
     vector<key*> keys = {univ1_k, ca16_k, ca18_k};
-    vector<val*> values = {univ1_v, ca16_v, ca18_v};
+    vector<val*> values = {univ1_v, ca16_v, ca18_v};*/
 
     
 
@@ -379,35 +237,36 @@ int main(int argc, char* argv[])
     setupOutputFile("time.raw_res", ostream, false);
     ofstream ostream1;
     setupOutputFile("nrmse.raw_res", ostream1, false);
-
     
+//      vector<key*>::iterator k_it = keys.begin();
+//     vector<val*>::iterator v_it = values.begin();
+//     vector<int>::iterator s_it = sizes.begin();
+//     vector<string>::iterator d_it = datasets.begin();
+    
+    
+//     key* kk = *k_it;
+//     val* vv = *v_it;
+//     int size = *s_it;   
+//     string dataset = *d_it;
+
+    /*
     for (int run = 0; run < k; run++) {
         vector<key*>::iterator k_it = keys.begin();
         vector<val*>::iterator v_it = values.begin();
         vector<int>::iterator s_it = sizes.begin();
         vector<string>::iterator d_it = datasets.begin();
         
-        for (int trc = 0; trc < 3; trc++) {
+        for (int trc = 0; trc < 1; trc++) {
             key* kk = *k_it;
             val* vv = *v_it;
             int size = *s_it;
             string dataset = *d_it;
-            
+            */
 //             cout<< "****  "<<dataset<<"  ****" << endl ;
             
             
-            struct timeb begintb, endtb;
-            clock_t begint, endt;
-            Cuckoo_waterLevel_HH_no_FP_SIMD_256<uint32_t, uint32_t> hh(1, 2, 3, maxl,gamma,size);
-            begint = clock();
-//             ftime(&begintb);
-            for (int i = 0; i < size; ++i) {
-                hh.insert(kk[i], vv[i]);
-            }
-            endt = clock();
-//             ftime(&endtb);
-            double time = ((double)(endt-begint))/CLK_PER_SEC;
 
+            double t = run(CAIDA16_SIZE, kk , vv,1);
             
                 
 //             double c =0.0; 
@@ -432,18 +291,18 @@ int main(int argc, char* argv[])
             int q = hh_nr_bins_over_two * 8;
             
             
-            ostream << "Cuckoo_MC" << dataset<<   "     " << q <<  "    " << time << endl;
+            ostream << "Cuckoo_MC" << /*dataset<<*/   "     " << q <<  "    " << t << endl;
 //             ostream1 << "Cuckoo_MC" << dataset<<  "     " << q << "     " << nrmse << endl;
             
             
-            ++k_it;
-            ++v_it;
-            ++s_it;
-            ++d_it;
+//             ++k_it;
+//             ++v_it;
+//             ++s_it;
+//             ++d_it;
             
-        }
-        
-    }
+//         }
+//         
+//     }
     ostream.close();
     ostream1.close();
     return 0;   

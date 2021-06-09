@@ -82,14 +82,13 @@ void initFastMod1(uint32_t d) {                                 // Set or change
     shf12 = sh2;
 }
 
-constexpr int hh_nr_bins = 1 << 14;
-constexpr int hh_nr_bins_over_two = hh_nr_bins >> 1;
+constexpr int hh_nr_bins = 1 << 15;
 
 template<class K, class V>
 class Cuckoo_waterLevel_HH_no_FP_SIMD_256 {
 private:
-	K _keys[hh_nr_bins_over_two][8] = {};
-	V _values[hh_nr_bins_over_two][8] = {};
+	K _keys[hh_nr_bins][8] = {};
+// 	V _values[hh_nr_bins][8] = {};
 	V _water_level_plus_1;
 	__m256i _wl_item;
 
@@ -109,13 +108,13 @@ private:
     long double _delta;
     float _gamma;
     U256 eight_samples;
-    U256 eight_samples1;
+//     U256 eight_samples1;
     rng::rng128 gen_arr;
     
     
     void updateZK();
     void get8samples();
-    void get8samples1();
+//     void get8samples1();
 	void move_to_bin(K key, V value, int bin);
 	void set_water_level(V wl);
 	void maintenance();
@@ -139,12 +138,12 @@ Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::Cuckoo_waterLevel_HH_no_FP_SIMD_256(i
 	_seed2 = seed2;
 	_seed3 = seed3;
     counter=0;
-	_mask = hh_nr_bins_over_two - 1;
+	_mask = hh_nr_bins - 1;
 	_water_level = 0;
 	_water_level_plus_1 = 1;
 	_wl_item = _mm256_set1_epi32((int)_water_level_plus_1);
-	_max_load = hh_nr_bins_over_two * 8 * max_load;
-	_insertions_till_maintenance_restart = hh_nr_bins_over_two * 8 * (max_load);
+	_max_load = hh_nr_bins * 8 * max_load;
+	_insertions_till_maintenance_restart = hh_nr_bins * 8 * (max_load);
 	_insertions_till_maintenance = _max_load;
 	srand(42);
     
@@ -169,11 +168,13 @@ Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::Cuckoo_waterLevel_HH_no_FP_SIMD_256(i
         _Z = _Z - (_Z & 0b111) + 8;
     _k = _Z * (_alpha * _gamma) / (1 + _gamma)+0.5;
     
-    cout<< "Z " <<_Z <<endl;
-    cout<< "k " <<_k <<endl;
+//     cout<< _insertions_till_maintenance_restart <<endl;
+//     cout<< "k " <<_k <<endl;
     
-    initFastMod(hh_nr_bins_over_two);
-    initFastMod1(8);
+    
+    
+    initFastMod(hh_nr_bins*4);
+//     initFastMod1(8);
 }
 
 template<class K, class V>
@@ -193,20 +194,27 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::insert(K key, V value)
 	//const __m256i wl_item = _mm256_set1_epi32(_water_level_plus_1);
 	const __m256i item = _mm256_set1_epi32((int)key);
 
-	const __m256i match1 = _mm256_cmpeq_epi32(item, *((__m256i*) _keys[bin1]));
-	const int     mask1 = _mm256_movemask_epi8(match1);
+    __m256i bin1Content = *((__m256i*) _keys[bin1]);
+    
+	const __m256i match1 = _mm256_cmpeq_epi32(item, bin1Content);
+	const int     mask1 = _mm256_movemask_epi8(match1) & 0xffff;
 	if (mask1 != 0) {
 		int tz1 = _tzcnt_u32(mask1);
-		_values[bin1][tz1 >> 2] += value;
+// 		_values[bin1][tz1 >> 2] += value;
+        _keys[bin1][4+(tz1 >> 2)] += value;
 		return;
 	}
 
 	uint64_t bin2 = (hash >> 32) & _mask;
-	const __m256i match2 = _mm256_cmpeq_epi32(item, *((__m256i*) _keys[bin2]));
-	const int     mask2 = _mm256_movemask_epi8(match2);
+    
+    __m256i bin2Content = *((__m256i*) _keys[bin2]);
+    
+	const __m256i match2 = _mm256_cmpeq_epi32(item, bin2Content);
+	const int     mask2 = _mm256_movemask_epi8(match2) & 0xffff;
 	if (mask2 != 0) {
 		int tz2 = _tzcnt_u32(mask2);
-		_values[bin2][tz2 >> 2] += value;
+// 		_values[bin2][tz2 >> 2] += value;
+        _keys[bin1][4+(tz2 >> 2)] += value;
 		return;
 	}
 
@@ -214,16 +222,17 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::insert(K key, V value)
 		maintenance();
 	}
 
-	//const __m256i wl_match1 = _mm256_cmple_epi32(*((__m256i*) _values[bin1]), wl_item);
-	const __m256i wl_match1 = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _values[bin1]));
-	const int     wl_mask1 = _mm256_movemask_epi8(wl_match1);
+// 	const __m256i wl_match1 = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _values[bin1]));
+    const __m256i wl_match1 = _mm256_cmpgt_epi32(_wl_item, bin1Content);
+	const int     wl_mask1 = _mm256_movemask_epi8(wl_match1) >> 16;
 
 	// Should we add deltas?
 	if (wl_mask1 != 0) {
 		int tz1 = _tzcnt_u32(wl_mask1);
 		empty_spot_in_bin1 = tz1 >> 2;
 		_keys[bin1][empty_spot_in_bin1] = key;
-		_values[bin1][empty_spot_in_bin1] = _water_level+value;
+// 		_values[bin1][empty_spot_in_bin1] = _water_level+value;
+        _keys[bin1][4+empty_spot_in_bin1] = _water_level+value;
 		return;
 	}
 
@@ -231,13 +240,15 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::insert(K key, V value)
 	//uint64_t bin2 = (hash >> 32) & _mask;
 
 
-	const __m256i wl_match2 = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _values[bin2]));
-	const int     wl_mask2 = _mm256_movemask_epi8(wl_match2);
+// 	const __m256i wl_match2 = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _values[bin2]));
+    const __m256i wl_match2 = _mm256_cmpgt_epi32(_wl_item, bin2Content);
+	const int     wl_mask2 = _mm256_movemask_epi8(wl_match2) >> 16 ;
 	if (wl_mask2 != 0) {
 		int tz2 = _tzcnt_u32(wl_mask2);
 		empty_spot_in_bin2 = tz2 >> 2;
 		_keys[bin2][empty_spot_in_bin2] = key;
-		_values[bin2][empty_spot_in_bin2] = _water_level + value;
+// 		_values[bin2][empty_spot_in_bin2] = _water_level + value;
+        _keys[bin2][empty_spot_in_bin2+4] = _water_level + value;
 		return;
 	}
 	K kicked_key;
@@ -245,21 +256,25 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::insert(K key, V value)
 	uint64_t kicked_from_bin;
 	int coinFlip = rand();
 	if (coinFlip & 0b1) {
-		int kicked_index = (coinFlip >> 1) & 0b111;
+		int kicked_index = (coinFlip >> 1) & 0b11;
 		kicked_key = _keys[bin1][kicked_index];
-		kicked_value = _values[bin1][kicked_index];
+// 		kicked_value = _values[bin1][kicked_index];
+        kicked_value = _keys[bin1][kicked_index+4];
 
 		_keys[bin1][kicked_index] = key;
-		_values[bin1][kicked_index] = _water_level + value;
+// 		_values[bin1][kicked_index] = _water_level + value;
+        _keys[bin1][kicked_index+4] = _water_level + value;
 		kicked_from_bin = bin1;
 		//insert(kicked_key, kicked_value);
 	}
 	else {
-		int kicked_index = (coinFlip >> 1) & 0b111;
+		int kicked_index = (coinFlip >> 1) & 0b11;
 		kicked_key = _keys[bin2][kicked_index];
-		kicked_value = _values[bin2][kicked_index];
+// 		kicked_value = _values[bin2][kicked_index];
+        kicked_value = _keys[bin2][4+kicked_index];
 		_keys[bin2][kicked_index] = key;
-		_values[bin2][kicked_index] = _water_level + value;
+// 		_values[bin2][kicked_index] = _water_level + value;
+        _keys[bin2][kicked_index+4] = _water_level + value;
 		kicked_from_bin = bin2;
 	}
 	uint64_t kicked_hash = XXH64((void *) &kicked_key, sizeof(kicked_key), _seed1);
@@ -279,31 +294,46 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::move_to_bin(K key, V value, int 
 {
     
 //     counter++;
-//     if(counter >=5){
+//     if(counter >=5){o
 //         maintenance();
 //         counter=0;
 //     }
     
     
     
-	const __m256i wl_match = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _values[bin]));
-	const int     wl_mask = _mm256_movemask_epi8(wl_match);
+    
+    
+// 	const __m256i wl_match = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _values[bin]));
+    const __m256i wl_match = _mm256_cmpgt_epi32(_wl_item, *((__m256i*) _keys[bin]));
+    
+    
+    
+	const int     wl_mask = _mm256_movemask_epi8(wl_match) >> 16;
+    
+//     cout << wl_mask << "       waterLVL: " << _water_level  << "        values: " << _keys[bin][4] << "  " << _keys[bin][5] << "  "<< _keys[bin][6] << "  "<< _keys[bin][7] << endl;
+    
 	if (wl_mask != 0) {
 		int tz = _tzcnt_u32(wl_mask);
 		int empty_spot_in_bin = tz >> 2;
 		_keys[bin][empty_spot_in_bin] = key;
-		_values[bin][empty_spot_in_bin] = value;
+// 		_values[bin][empty_spot_in_bin] = value;
+        _keys[bin][empty_spot_in_bin+4] = value;
 //         counter = 0;
 		return;
 	}
 
-	int kicked_index = rand() & 0b111;
+	int kicked_index = rand() & 0b11;
+    
+//     cout << kicked_index <<  "   "<< bin << "   " <<  key << "   "<< value << endl;
+    
 	K kicked_key = _keys[bin][kicked_index];
-	V kicked_value = _values[bin][kicked_index];
+// 	V kicked_value = _values[bin][kicked_index];
+    V kicked_value = _keys[bin][4+kicked_index];
 	_keys[bin][kicked_index] = key;
-	_values[bin][kicked_index] = value;
+// 	_values[bin][kicked_index] = value;
+    _keys[bin][kicked_index+4] = value;
 
-	uint64_t kicked_hash = XXH64((void *) &kicked_key, sizeof(kicked_key), _seed1);
+    uint64_t kicked_hash = XXH64((void *) &kicked_key, sizeof(kicked_key), _seed1);
 	uint64_t kicked_bin_1 = kicked_hash & _mask;
 
 	uint64_t kicked_from_bin = bin;
@@ -320,22 +350,24 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::move_to_bin(K key, V value, int 
 template<class K, class V>
 V Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::query(K key)
 {
-	uint64_t hash = XXH64((void *) &key, sizeof(key), _seed1);
+    uint64_t hash = XXH64((void *) &key, sizeof(key), _seed1);
 	uint64_t bin1 = hash & _mask;
 	const __m256i item = _mm256_set1_epi32((int)key);
 	const __m256i match1 = _mm256_cmpeq_epi32(item, *((__m256i*) _keys[bin1]));
-	const int mask = _mm256_movemask_epi8(match1);
+	const int mask = _mm256_movemask_epi8(match1) & 0xffff;
 	if (mask != 0) {
 		int tz1 = _tzcnt_u32(mask);
-		return _values[bin1][tz1 >> 2];
+// 		return _values[bin1][tz1 >> 2];
+        return _keys[bin1][4+(tz1 >> 2)];
 	}
 	uint64_t bin2 = (hash >> 32) & _mask;
 	const __m256i match2 = _mm256_cmpeq_epi32(item, *((__m256i*) _keys[bin2]));
-	const int mask2 = _mm256_movemask_epi8(match2);
+	const int mask2 = _mm256_movemask_epi8(match2) & 0xffff;
 	if (mask2 != 0) {
 		//cout << tz1 << endl;
 		int tz2 = _tzcnt_u32(mask2);
-		return _values[bin2][tz2 >> 2];
+// 		return _values[bin2][tz2 >> 2];
+        return _keys[bin2][4+(tz2 >> 2)];
 	}
 	return _water_level;
 }
@@ -371,23 +403,23 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::get8samples() {
     eight_samples.ymm = _mm256_sub_epi32(eight_samples.ymm, t12);                   // subtract
 }
 
-template<class K, class V>
-void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::get8samples1() {
-    int indx = 0;
-    eight_samples1.ymm = _mm256_set_epi64x(gen_arr(), gen_arr(), gen_arr(), gen_arr());
-    __m256i t1 = _mm256_mul_epu32(eight_samples1.ymm, m11);                           // 32x32->64 bit unsigned multiplication of even elements of a
-    __m256i t2 = _mm256_srli_epi64(t1, 32);                         // high dword of even numbered results
-    __m256i t3 = _mm256_srli_epi64(eight_samples1.ymm, 32);                          // get odd elements of a into position for multiplication
-    __m256i t4 = _mm256_mul_epu32(t3, m11);                          // 32x32->64 bit unsigned multiplication of odd elements
-    __m256i t5 = _mm256_set_epi32(-1, 0, -1, 0, -1, 0, -1, 0);      // mask for odd elements
-    __m256i t7 = _mm256_blendv_epi8(t2, t4, t5);                    // blend two results
-    __m256i t8 = _mm256_sub_epi32(eight_samples1.ymm, t7);                           // subtract
-    __m256i t9 = _mm256_srli_epi32(t8, shf11);                       // shift right logical
-    __m256i t10 = _mm256_add_epi32(t7, t9);                         // add
-    __m256i t11 = _mm256_srli_epi32(t10, shf12);                     // shift right logical 
-    __m256i t12 = _mm256_mullo_epi32(t11, d11);                      // multiply quotient with divisor
-    eight_samples1.ymm = _mm256_sub_epi32(eight_samples1.ymm, t12);                   // subtract
-}
+// template<class K, class V>
+// void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::get8samples1() {
+//     int indx = 0;
+//     eight_samples1.ymm = _mm256_set_epi64x(gen_arr(), gen_arr(), gen_arr(), gen_arr());
+//     __m256i t1 = _mm256_mul_epu32(eight_samples1.ymm, m11);                           // 32x32->64 bit unsigned multiplication of even elements of a
+//     __m256i t2 = _mm256_srli_epi64(t1, 32);                         // high dword of even numbered results
+//     __m256i t3 = _mm256_srli_epi64(eight_samples1.ymm, 32);                          // get odd elements of a into position for multiplication
+//     __m256i t4 = _mm256_mul_epu32(t3, m11);                          // 32x32->64 bit unsigned multiplication of odd elements
+//     __m256i t5 = _mm256_set_epi32(-1, 0, -1, 0, -1, 0, -1, 0);      // mask for odd elements
+//     __m256i t8 = _mm256_blendv_epi8(t2, t4, t5);                    // blend two results
+//     __m256i t8 = _mm256_sub_epi32(eight_samples1.ymm, t8);                           // subtract
+//     __m256i t9 = _mm256_srli_epi32(t8, shf11);                       // shift right logical
+//     __m256i t10 = _mm256_add_epi32(t8, t9);                         // add
+//     __m256i t11 = _mm256_srli_epi32(t10, shf12);                     // shift right logical 
+//     __m256i t12 = _mm256_mullo_epi32(t11, d11);                      // multiply quotient with divisor
+//     eight_samples1.ymm = _mm256_sub_epi32(eight_samples1.ymm, t12);                   // subtract
+// }
 
 
 
@@ -395,8 +427,9 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::get8samples1() {
 
 template<class K, class V>
 inline void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::maintenance()
-{
-    
+{/*
+    counter++;
+    cout<< counter <<endl;*/
 /*    
     cout<< "@@@@@@@@@@@@@@@"<<endl;
     cout<< "delta "<< _delta <<endl;
@@ -405,8 +438,8 @@ inline void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::maintenance()
     */
     
 //     cout<< "maintenance" << endl;
-// 	int size = hh_nr_bins_over_two * 8;
-// 	V copy_of_values[hh_nr_bins_over_two][8];
+// 	int size = hh_nr_bins * 8;
+// 	V copy_of_values[hh_nr_bins][8];
 // 	memcpy(copy_of_values, _values, size * sizeof(V));
 // 	V* one_array = (V*)copy_of_values;
 // 	sort(one_array, one_array + size);
@@ -421,14 +454,14 @@ inline void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::maintenance()
     int left_to_fill = _k;
     while (left_to_fill > 0) {
         get8samples();
-        get8samples1();
         for (int i = 0; i < 8; ++i) {
-            
-            p.push(_values[eight_samples.i[i]][eight_samples1.i[i]]);
+            int a  = eight_samples.i[i] & 4;
+            int b  = eight_samples.i[i] / 4;
+            p.push(_keys[b][4+a]);
         }
         left_to_fill -= 8;
     }
-
+    
     int left_to_sample = _Z-_k+ left_to_fill;
     while (left_to_fill++ < 0) {
         p.pop();
@@ -437,11 +470,12 @@ inline void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::maintenance()
 
     while (left_to_sample > 0) {
         get8samples();
-        get8samples1();
         for (int i = 0; i < 8; ++i) {
-            if (top > _values[eight_samples.i[i]][eight_samples1.i[i]]) {
+            int a  = eight_samples.i[i] & 4;
+            int b  = eight_samples.i[i] / 4;
+            if (top > _keys[b][4+a]) {
                 p.pop();
-                p.push(_values[eight_samples.i[i]][eight_samples1.i[i]]);
+                p.push(_keys[b][4+a]);
                 top = p.top();
             }
         }
@@ -493,7 +527,7 @@ void Cuckoo_waterLevel_HH_no_FP_SIMD_256<K, V>::test_correctness()
 		insert(id, val);
 		//cout << "id = " << id << " val = " << val << " query(id) = " << query(id) << endl;
 	}
-	int nr_counters = hh_nr_bins_over_two * 8;
+	int nr_counters = hh_nr_bins * 8;
 	float eps = 2.0 / nr_counters;
 	for (auto it = true_map.begin(); it != true_map.end(); ++it) {
 		if ((it->second > query(it->first)) || (it->second < query(it->first) - S*eps)) {
