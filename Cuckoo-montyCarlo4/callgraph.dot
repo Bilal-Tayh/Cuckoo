@@ -1,0 +1,23 @@
+digraph "callgraph" {
+  F55c6d22a9b10 [label="0x0000000000409a0c\n195 167 788 565"];
+  F55c6d22ad710 [label="0x00000000004032e0\n97 509 070 111"];
+  F55c6d22b2bc0 [label="0x000000000040b9e2\n72 752 227 728"];
+  F55c6d22be010 [label="0x0000000000407408\n41 844 233 080"];
+  F55c6d22be850 [label="0x0000000000405998\n25 750 297 280"];
+  F55c6d22cec00 [label="(below main)\n195 167 788 565"];
+  F55c6d22ee3f0 [label="std::istream::read(char*, long...\n96 818 257 489"];
+  F55c6d22feb20 [label="0x00000000004034b0\n195 167 788 565"];
+  F55c6d23a8f30 [label="std::basic_streambuf<char, std...\n32 573 526 130"];
+  F55c6d23bdcc0 [label="std::istream::sentry::sentry(s...\n19 342 499 764"];
+  F55c6d23e0a50 [label="std::basic_filebuf<char, std::...\n56 060 854 302"];
+  F55c6d22a9b10 -> F55c6d22ad710 [weight=3,label="97 509 070 111 (690 803 564x)"];
+  F55c6d22a9b10 -> F55c6d22b2bc0 [weight=3,label="72 752 227 728 (321 718 325x)"];
+  F55c6d22ad710 -> F55c6d22ee3f0 [weight=3,label="96 818 257 489 (690 803 563x)"];
+  F55c6d22b2bc0 -> F55c6d22be010 [weight=3,label="41 844 233 080 (321 878 716x)"];
+  F55c6d22be010 -> F55c6d22be850 [weight=3,label="25 750 297 280 (321 878 716x)"];
+  F55c6d22cec00 -> F55c6d22a9b10 [weight=3,label="195 167 788 565 (1x)"];
+  F55c6d22ee3f0 -> F55c6d23bdcc0 [weight=3,label="19 342 499 764 (690 803 563x)"];
+  F55c6d22ee3f0 -> F55c6d23e0a50 [weight=3,label="56 060 854 302 (690 803 564x)"];
+  F55c6d22feb20 -> F55c6d22cec00 [weight=3,label="195 167 788 565 (1x)"];
+  F55c6d23e0a50 -> F55c6d23a8f30 [weight=3,label="32 573 526 130 (690 803 563x)"];
+}
